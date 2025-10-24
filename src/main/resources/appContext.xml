@@ -14,19 +14,16 @@
            http://www.springframework.org/schema/data/jpa
            http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
 
-    <!-- Load properties file -->
+
     <context:property-placeholder location="classpath:database.properties"/>
 
-    <!-- Enable component scanning for @Service, @Repository, @Component -->
-    <context:component-scan base-package="com.toctoc"/>
 
-    <!-- Enable Spring Data JPA repositories -->
     <jpa:repositories base-package="com.toctoc.repository"/>
 
-    <!-- Enable transaction management -->
-    <tx:annotation-driven transaction-manager="transactionManager"/>
 
-    <!-- DataSource Bean (HikariCP Connection Pool) -->
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+
+
     <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
         <property name="driverClassName" value="${db.driver}"/>
         <property name="jdbcUrl" value="${db.url}"/>
@@ -35,9 +32,11 @@
         <property name="maximumPoolSize" value="10"/>
         <property name="minimumIdle" value="5"/>
         <property name="connectionTimeout" value="30000"/>
+        <property name="idleTimeout" value="600000"/>
+        <property name="maxLifetime" value="1800000"/>
     </bean>
 
-    <!-- EntityManagerFactory Bean -->
+
     <bean id="entityManagerFactory"
           class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="dataSource"/>
@@ -46,6 +45,7 @@
             <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
                 <property name="showSql" value="${hibernate.show_sql}"/>
                 <property name="generateDdl" value="true"/>
+                <property name="databasePlatform" value="${hibernate.dialect}"/>
             </bean>
         </property>
         <property name="jpaProperties">
@@ -53,13 +53,28 @@
                 <prop key="hibernate.dialect">${hibernate.dialect}</prop>
                 <prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
                 <prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+                <prop key="hibernate.use_sql_comments">true</prop>
             </props>
         </property>
     </bean>
 
-    <!-- Transaction Manager Bean -->
+
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="entityManagerFactory" ref="entityManagerFactory"/>
     </bean>
+
+
+    <!-- LivreurService - Constructor Injection -->
+    <bean id="livreurService" class="com.toctoc.service.LivreurServiceImpl">
+        <constructor-arg ref="livreurRepository"/>
+    </bean>
+
+    <!-- ColisService - Setter Injection (Field + Setter) -->
+    <bean id="colisService" class="com.toctoc.service.ColisServiceImpl">
+        <property name="colisRepository" ref="colisRepository"/>
+        <property name="livreurRepository" ref="livreurRepository"/>
+    </bean>
+
+
 
 </beans>
