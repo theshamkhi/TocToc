@@ -1,30 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.toctoc</groupId>
+    <groupId>com.toctoc</groupId>
     <artifactId>TocToc</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <spring.version>6.1.0</spring.version>
-        <hibernate.version>6.3.1.Final</hibernate.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.version>6.0.11</spring.version>
+        <hibernate.version>6.2.7.Final</hibernate.version>
+        <querydsl.version>5.0.0</querydsl.version>
     </properties>
 
     <dependencies>
-        <!-- Spring Core -->
+        <!-- Spring Context -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
         </dependency>
 
-        <!-- Spring ORM (for JPA integration) -->
+        <!-- Spring ORM -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
@@ -35,10 +37,10 @@
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-jpa</artifactId>
-            <version>3.2.0</version>
+            <version>3.1.2</version>
         </dependency>
 
-        <!-- Hibernate (JPA Implementation) -->
+        <!-- Hibernate Core -->
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
@@ -52,11 +54,11 @@
             <version>42.7.0</version>
         </dependency>
 
-        <!-- HikariCP (Connection Pool) -->
+        <!-- HikariCP Connection Pool -->
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>5.1.0</version>
+            <version>5.0.1</version>
         </dependency>
 
         <!-- Jakarta Persistence API -->
@@ -66,11 +68,26 @@
             <version>3.1.0</version>
         </dependency>
 
-        <!-- Jakarta Annotation API (for @PostConstruct, etc.) -->
+        <!-- Jakarta Annotation API -->
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
             <version>2.1.1</version>
+        </dependency>
+
+        <!-- Querydsl JPA (Required for Spring Data JPA) -->
+        <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-jpa</artifactId>
+            <version>${querydsl.version}</version>
+            <classifier>jakarta</classifier>
+        </dependency>
+
+        <!-- Querydsl Core -->
+        <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-core</artifactId>
+            <version>${querydsl.version}</version>
         </dependency>
 
         <!-- Lombok -->
@@ -80,10 +97,18 @@
             <version>1.18.30</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- SLF4J Simple (to avoid SLF4J warnings) -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.9</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <!-- Maven Compiler Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -91,6 +116,16 @@
                 <configuration>
                     <source>17</source>
                     <target>17</target>
+                </configuration>
+            </plugin>
+
+            <!-- Exec Maven Plugin with Main Class Configuration -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>com.toctoc.Main</mainClass>
                 </configuration>
             </plugin>
         </plugins>
