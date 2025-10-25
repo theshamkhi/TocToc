@@ -14,16 +14,22 @@
            http://www.springframework.org/schema/data/jpa
            http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
 
-
+    <!-- Load database properties -->
     <context:property-placeholder location="classpath:database.properties"/>
 
+    <!-- Enable component scanning for Field Injection -->
+    <context:component-scan base-package="com.toctoc.service"/>
 
-    <jpa:repositories base-package="com.toctoc.repository"/>
+    <!-- Enable JPA Repositories -->
+    <jpa:repositories
+            base-package="com.toctoc.repository"
+            entity-manager-factory-ref="entityManagerFactory"
+            transaction-manager-ref="transactionManager"/>
 
-
+    <!-- Enable Transaction Management -->
     <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
 
-
+    <!-- DataSource Configuration -->
     <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
         <property name="driverClassName" value="${db.driver}"/>
         <property name="jdbcUrl" value="${db.url}"/>
@@ -36,7 +42,7 @@
         <property name="maxLifetime" value="1800000"/>
     </bean>
 
-
+    <!-- EntityManagerFactory Configuration -->
     <bean id="entityManagerFactory"
           class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="dataSource"/>
@@ -58,23 +64,28 @@
         </property>
     </bean>
 
-
+    <!-- Transaction Manager -->
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="entityManagerFactory" ref="entityManagerFactory"/>
     </bean>
 
+    <!-- ========================================= -->
+    <!-- SERVICE BEANS - DEMONSTRATING 3 INJECTION TYPES AND SCOPES -->
+    <!-- ========================================= -->
 
-    <!-- LivreurService - Constructor Injection -->
-    <bean id="livreurService" class="com.toctoc.service.LivreurServiceImpl">
+    <!-- 1. LivreurService - Constructor Injection (SINGLETON scope - default) -->
+    <bean id="livreurService" class="com.toctoc.service.LivreurServiceImpl" scope="singleton">
         <constructor-arg ref="livreurRepository"/>
     </bean>
 
-    <!-- ColisService - Setter Injection (Field + Setter) -->
-    <bean id="colisService" class="com.toctoc.service.ColisServiceImpl">
+    <!-- 2. ColisService - Setter Injection (SINGLETON scope - default) -->
+    <bean id="colisService" class="com.toctoc.service.ColisServiceImpl" scope="singleton">
         <property name="colisRepository" ref="colisRepository"/>
         <property name="livreurRepository" ref="livreurRepository"/>
     </bean>
 
-
+    <!-- 3. StatistiqueService - Field Injection using @Autowired (PROTOTYPE scope) -->
+    <!-- This bean is created fresh each time it's requested -->
+    <bean id="statistiqueService" class="com.toctoc.service.StatistiqueServiceImpl" scope="prototype"/>
 
 </beans>
